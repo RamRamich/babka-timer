@@ -38,13 +38,18 @@
       background-clip: text;
     }
     .time-display {
-      font-size: 4rem;
+      font-size: 3.5rem;
       font-weight: 800;
       font-family: 'Courier New', monospace;
-      margin: 30px 0;
+      margin: 20px 0;
       text-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      letter-spacing: 5px;
+      letter-spacing: 3px;
       min-height: 80px;
+    }
+    .days-label {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      margin-bottom: 30px;
     }
     .stop-btn {
       background: linear-gradient(45deg, #ff6b6b, #ee5a24);
@@ -95,13 +100,14 @@
     }
     @media (max-width: 600px) {
       .title { font-size: 1.8rem; }
-      .time-display { font-size: 3rem; }
+      .time-display { font-size: 2.8rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="title">Бабка задержала подарок на</h1>
+    <div class="days-label" id="daysLabel">0 дней</div>
     <div class="time-display" id="time">00:00:00</div>
     <button class="stop-btn" id="stopBtn">🛑 Остановить</button>
   </div>
@@ -109,6 +115,7 @@
   <script>
     const startTime = new Date('2026-04-16T23:59:59').getTime();
     const timeEl = document.getElementById('time');
+    const daysLabel = document.getElementById('daysLabel');
     const btn = document.getElementById('stopBtn');
     const container = document.querySelector('.container');
     let interval;
@@ -126,7 +133,10 @@
       if (!running) return;
       const now = Date.now();
       const elapsed = now - startTime;
-      timeEl.textContent = formatTime(elapsed);
+      const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+      const timeMs = elapsed % (1000 * 60 * 60 * 24);
+      daysLabel.textContent = `${days} дней`;
+      timeEl.textContent = formatTime(timeMs);
     }
 
     function startConfetti() {
@@ -148,10 +158,11 @@
       if (running) {
         running = false;
         clearInterval(interval);
-        btn.textContent = '🎉 Победил!';
+        btn.textContent = '🎉 Подарила!';
         btn.classList.add('victory');
         container.classList.add('stopped');
         timeEl.classList.add('victory');
+        daysLabel.classList.add('victory');
         startConfetti();
       }
     });
