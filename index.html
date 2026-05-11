@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бабка задержала подарок</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 60px 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 500px;
+      width: 90%;
+      transition: all 0.5s ease;
+    }
+    .title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .time-display {
+      font-size: 4rem;
+      font-weight: 800;
+      font-family: 'Courier New', monospace;
+      margin: 30px 0;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      letter-spacing: 5px;
+      min-height: 80px;
+    }
+    .stop-btn {
+      background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+      color: white;
+      border: none;
+      padding: 18px 50px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(255,107,107,0.4);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .stop-btn:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(255,107,107,0.6);
+    }
+    .stopped { opacity: 0.7; }
+    /* Конфетти */
+    .confetti {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      background: #ffd700;
+      animation: confetti-fall 3s linear infinite;
+      pointer-events: none;
+      top: -20px;
+      left: var(--left);
+    }
+    .confetti:nth-child(2) { background: #ff6b6b; animation-delay: -0.5s; }
+    .confetti:nth-child(3) { background: #4ecdc4; animation-delay: -1s; }
+    .confetti:nth-child(4) { background: #45b7d1; animation-delay: -1.5s; }
+    .confetti:nth-child(5) { background: #96ceb4; animation-delay: -2s; }
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    .victory {
+      animation: victory-bounce 0.6s ease infinite;
+    }
+    @keyframes victory-bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    @media (max-width: 600px) {
+      .title { font-size: 1.8rem; }
+      .time-display { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Бабка задержала подарок на</h1>
+    <div class="time-display" id="time">00:00:00</div>
+    <button class="stop-btn" id="stopBtn">🛑 Остановить</button>
+  </div>
+
+  <script>
+    const startTime = new Date('2026-04-16T23:59:59').getTime();
+    const timeEl = document.getElementById('time');
+    const btn = document.getElementById('stopBtn');
+    const container = document.querySelector('.container');
+    let interval;
+    let running = true;
+
+    function formatTime(ms) {
+      const secs = Math.floor(ms / 1000);
+      const h = Math.floor(secs / 3600).toString().padStart(2, '0');
+      const m = Math.floor((secs % 3600) / 60).toString().padStart(2, '0');
+      const s = (secs % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateTime() {
+      if (!running) return;
+      const now = Date.now();
+      const elapsed = now - startTime;
+      timeEl.textContent = formatTime(elapsed);
+    }
+
+    function startConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.style.left = Math.random() * 100 + '%';
+        conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        conf.style.width = conf.style.height = (Math.random() * 10 + 8) + 'px';
+        document.body.appendChild(conf);
+        setTimeout(() => conf.remove(), 5000);
+      }
+    }
+
+    interval = setInterval(updateTime, 1000);
+    updateTime();
+
+    btn.addEventListener('click', () => {
+      if (running) {
+        running = false;
+        clearInterval(interval);
+        btn.textContent = '🎉 Победил!';
+        btn.classList.add('victory');
+        container.classList.add('stopped');
+        timeEl.classList.add('victory');
+        startConfetti();
+      }
+    });
+  </script>
+</body>
+</html>
